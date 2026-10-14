@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Acoustic Machine Health Monitor
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js">
+    </script>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <header class="header">
+
+        <div class="header-content">
+
+            <h1>
+                🔧 Acoustic Machine Health Monitor
+            </h1>
+
+            <p class="tagline">
+                Real-time Frequency Analysis & Anomaly Detection
+            </p>
+
+        </div>
+
+
+        <button
+            class="btn btn-primary"
+            id="calibrateBtn">
+
+            🎯 Calibrate Machine Frequency
+
+        </button>
+
+
+        <div class="connection-status">
+
+            <span
+                class="status-dot disconnected"
+                id="connectionDot">
+            </span>
+
+            <span id="connectionText">
+                Disconnected
+            </span>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ================================================= -->
+    <!-- DASHBOARD -->
+    <!-- ================================================= -->
+
+    <main class="dashboard">
+
+
+        <!-- ================================================= -->
+        <!-- STATUS -->
+        <!-- ================================================= -->
+
+        <section class="status-section">
+
+
+            <div class="status-card">
+
+                <h2>
+                    System Status
+                </h2>
+
+
+                <div
+                    class="status-badge"
+                    id="statusBadge">
+
+                    <span class="status-icon">
+                        ●
+                    </span>
+
+                    <span id="statusText">
+                        INITIALIZING
+                    </span>
+
+                </div>
+
+
+                <p
+                    class="status-description"
+                    id="statusDescription">
+
+                    Waiting for sensor connection...
+
+                </p>
+
+            </div>
+
+
+
+            <!-- ================================================= -->
+            <!-- METRICS -->
+            <!-- ================================================= -->
+
+            <div class="metrics-grid">
+
+
+                <!-- PEAK FREQUENCY -->
+
+                <div class="metric-card">
+
+                    <h3>
+                        Peak Frequency
+                    </h3>
+
+                    <div class="metric-value">
+
+                        <span id="peakFrequency">
+                            --
+                        </span>
+
+                        <span class="metric-unit">
+                            Hz
+                        </span>
+
+                    </div>
+
+                    <p class="metric-range">
+                        Current measured peak
+                    </p>
+
+                </div>
+
+
+
+                <!-- MAXIMUM FREQUENCY LIMIT -->
+
+                <div class="metric-card">
+
+                    <h3>
+                        Maximum Frequency Limit
+                    </h3>
+
+                    <div class="metric-value">
+
+                        <span id="maxFrequency">
+                            --
+                        </span>
+
+                        <span class="metric-unit">
+                            Hz
+                        </span>
+
+                    </div>
+
+                    <p class="metric-range">
+                        Machine-specific calibrated limit
+                    </p>
+
+                </div>
+
+
+
+                <!-- ANOMALY SCORE -->
+
+                <div class="metric-card">
+
+                    <h3>
+                        Anomaly Score
+                    </h3>
+
+                    <div class="metric-value">
+
+                        <span id="anomalyScore">
+                            0
+                        </span>
+
+                        <span class="metric-unit">
+                            %
+                        </span>
+
+                    </div>
+
+                    <p class="metric-range">
+                        Anomaly confidence
+                    </p>
+
+                </div>
+
+
+
+                <!-- FRICTION ENERGY -->
+
+                <div class="metric-card">
+
+                    <h3>
+                        Friction Energy
+                    </h3>
+
+                    <div class="metric-value">
+
+                        <span id="frictionEnergy">
+                            --
+                        </span>
+
+                    </div>
+
+                    <p class="metric-range">
+                        Friction band energy
+                    </p>
+
+                </div>
+
+
+
+                <!-- UPTIME -->
+
+                <div class="metric-card">
+
+                    <h3>
+                        Uptime
+                    </h3>
+
+                    <div class="metric-value">
+
+                        <span id="uptime">
+                            00:00:00
+                        </span>
+
+                    </div>
+
+                    <p class="metric-range">
+                        System running
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- CONTROLS -->
+        <!-- ================================================= -->
+
+        <section class="control-section">
+
+            <h2>
+                System Controls
+            </h2>
+
+
+            <div class="button-group">
+
+
+                <button
+                    class="btn btn-secondary"
+                    id="resetBtn">
+
+                    🔄 Reset Log
+
+                </button>
+
+
+                <button
+                    class="btn btn-secondary"
+                    id="exportBtn">
+
+                    📥 Export Data
+
+                </button>
+
+            </div>
+
+
+            <p class="info-text">
+
+                Calibration measures the machine's normal peak
+                frequency for 3 seconds. Keep the machine
+                running normally during calibration.
+
+            </p>
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- FREQUENCY CHART -->
+        <!-- ================================================= -->
+
+        <section
+            class="chart-section"
+            id="chartSection">
+
+            <h2>
+                Real-Time Frequency Spectrum
+            </h2>
+
+
+            <div class="chart-container">
+
+                <canvas
+                    id="frequencyChart">
+                </canvas>
+
+            </div>
+
+
+            <div class="chart-legend">
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-color healthy">
+                    </span>
+
+                    <span>
+                        Healthy Band (0 - 3,000 Hz)
+                    </span>
+
+                </div>
+
+
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-color critical">
+                    </span>
+
+                    <span>
+                        Critical Status 🚨
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- EVENT LOG -->
+        <!-- ================================================= -->
+
+        <section class="log-section">
+
+            <h2>
+                Anomaly Event Log
+            </h2>
+
+
+            <div class="log-controls">
+
+                <input
+                    type="text"
+                    id="filterInput"
+                    class="filter-input"
+                    placeholder="Search events...">
+
+
+                <select
+                    id="filterLevel"
+                    class="filter-select">
+
+                    <option value="">
+                        All Levels
+                    </option>
+
+                    <option value="healthy">
+                        Healthy
+                    </option>
+
+                    <option value="critical">
+                        Critical
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="event-log-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Timestamp
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Peak Freq (Hz)
+                            </th>
+
+                            <th>
+                                Anomaly Score (%)
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="eventLogBody">
+
+                        <tr class="empty-row">
+
+                            <td colspan="5">
+
+                                No events recorded yet.
+                                Waiting for sensor data...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="log-stats">
+
+                <p>
+
+                    Total Events:
+
+                    <strong id="totalEvents">
+                        0
+                    </strong>
+
+                </p>
+
+
+                <p>
+
+                    Critical Alerts:
+
+                    <strong
+                        id="criticalCount"
+                        class="critical-number">
+
+                        0
+
+                    </strong>
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================================= -->
+        <!-- DEBUG -->
+        <!-- ================================================= -->
+
+        <section class="debug-section">
+
+            <h2>
+                Debug Information
+            </h2>
+
+
+            <div class="debug-content">
+
+
+                <p>
+
+                    <strong>
+                        Last Update:
+                    </strong>
+
+                    <span id="lastUpdate">
+                        --:--:--
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Sample Rate:
+                    </strong>
+
+                    <span id="sampleRate">
+                        --
+                    </span>
+
+                    Hz
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        FFT Size:
+                    </strong>
+
+                    <span id="fftSize">
+                        --
+                    </span>
+
+                    samples
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Maximum Frequency Limit:
+                    </strong>
+
+                    <span id="debugFrequencyLimit">
+                        --
+                    </span>
+
+                    Hz
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Friction Threshold:
+                    </strong>
+
+                    <span id="frictionThreshold">
+                        --
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Calibration:
+                    </strong>
+
+                    <span id="calibrationStatus">
+                        --
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        WebSocket URL:
+                    </strong>
+
+                    <span id="wsUrl">
+                        --
+                    </span>
+
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================= -->
+
+    <footer class="footer">
+
+        <p>
+
+            &copy; Motor Bearing Fault Detection System
+            | Powered by ESP32 + FFT Analysis
+
+        </p>
+
+    </footer>
+
+</div>
+
+
+
+<!-- ================================================= -->
+<!-- TOAST -->
+<!-- ================================================= -->
+
+<div
+    id="toast"
+    class="toast">
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
